@@ -1,52 +1,72 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
-import { Google as GoogleIcon, Facebook as FacebookIcon } from '@mui/icons-material';
-import { loginUser } from '@/services/apiService';
-import { useMutation } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
+import { ButtonLoader } from '@/components/common/loading-button/loading-button';
+
+import { loginMutation } from "../../../queries/authQueries";
+import CustomToast from '@/components/common/toastMessage/toastMessage';
+import GoogleLogin from '@/components/common/googleLogin/googleLogin';
+import Link from 'next/link';
+import ErrorBox from '@/components/common/ErrorBox';
+import { MESSAGES } from '../../../../helper/constant';
+import { useRouter } from 'next/navigation';
+import { setCurrentUser } from '../../../../helper/common';
+import { loginUser } from '@/store/user/userSlice';
+import { useDispatch } from 'react-redux';
 const Login = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const [values, setValues] = useState({
     email: "",
     password: ""
   });
 
-  const loginQuery = useMutation({
-    mutationFn: loginUser,
-    onSuccess: (data) => {
-      console.log('Login successful:', data);
-      if(data.success){
-            toast.success( data.data || data.message)
-            setCurrentUser(data.data)
-          }
-          else toast.error( data.data || data.message)
-    },
-    onError: (err) => {
-      console.error('Login failed:', err);
-      toast("Something went wrong")
-    },
+  const { mutate, isPending, data, isError, isSuccess, error } = loginMutation();
 
-  });
+  useEffect(() => {
+    if (isSuccess) {
+      if (data?.status) {
+        CustomToast(data?.message || "Login successful!", 'success');
+        console.log('data?.data=',{token : data?.data?.token , ...data?.data?.data});
+        
+        // setCurrentUser(data?.data ?? {})
+        dispatch(loginUser({token : data?.data?.token , ...data?.data?.data}));
+        // router.push('/home')
+      }
+      else CustomToast(data?.message || "Login failed", 'error');
+    } else if (isError) {
+      CustomToast(error?.message || MESSAGES.serverError, 'error');
+    }
+  }, [isSuccess, isError, data]);
 
   const login = async (e) => {
     e.preventDefault();
-    loginQuery.mutate({ ...values })
+    mutate({ ...values })
   }
-  
+
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="xs" sx={{ height: '100vh', }}>
+      {/* <Box sx={{position : 'relative'}}>
+        <ErrorBox message={'error'} width={200} height={30.}/>
+      </Box> */}
+
       <Box
         sx={{
           marginTop: 8,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          border: '1px solid #476381',
+          padding: '20px 20px',
+          borderRadius: '7px',
+          height: '450px',
+          backgroundColor: "#fff"
         }}
       >
         <Typography component="h1" variant="h5">
           Login
         </Typography>
-        <Box component="form" onSubmit={login} noValidate sx={{ mt: 1 }}>
+        <form onSubmit={login}>
           <TextField
             margin="normal"
             required
@@ -72,33 +92,18 @@ const Login = () => {
             onChange={(e) => setValues({ ...values, password: e.target.value })}
           />
           <Button
+            className='custom_btn'
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-
+            disabled={isPending}
           >
-            Login
+            {isPending ? <ButtonLoader /> : "Login"}
           </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            startIcon={<GoogleIcon />}
-            sx={{ mb: 2 }}
-            color='error'
-          >
-            Login with Google
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            startIcon={<FacebookIcon />}
-            sx={{ mb: 2 }}
-            color='primary'
-          >
-            Login with Facebook
-          </Button>
-        </Box>
+          <GoogleLogin />
+        </form>
+        <Typography>Don't have an account? <Link style={{ 'color': 'blue' }} href={'/auth/sign-up'}>Signup</Link></Typography>
       </Box>
     </Container>
   );

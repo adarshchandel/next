@@ -1,0 +1,61 @@
+/* Footer */
+.footer {
+    background-color: #2C3E50;
+    color: white;
+    padding: 40px 20px;
+}
+
+.footer h4 {
+    margin-bottom: 20px;
+}
+
+.footer .social-links a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+.footer .social-links a:hover {
+    text-decoration: underline;
+}
+
+.footer .app-links img {
+    width: 120px;
+    margin: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-content h1 {
+        font-size: 30px;
+    }
+
+    .hero-image {
+        max-width: 100%;
+    }
+
+    .feature-grid {
+        flex-direction: column;
+    }
+
+    .feature-item {
+        margin: 10px 0;
+    }
+
+    .header {
+        flex-direction: column;
+    }
+
+    .header .nav {
+        margin-top: 10px;
+    }
+
+    .footer .social-links {
+        margin-bottom: 20px;
+    }
+}

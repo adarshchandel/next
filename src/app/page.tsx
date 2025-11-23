@@ -1,7 +1,7 @@
-// import Home from "./chat/page";
+import dynamic from "next/dynamic"
+
+const LandingPage = dynamic(() => import('../components/pages/landingPage/landingPage'), { ssr: true })
 
 export default function App() {
-  return (
-  <h1>This is main page</h1>
-  );
+  return <LandingPage />
 }

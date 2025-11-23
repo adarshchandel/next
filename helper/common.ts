@@ -1,5 +1,5 @@
 export const getCurrentUser = (key:string)=> {
-    if(typeof window == "undefined") return 
+    if(typeof window === "undefined") return 
     let user = JSON.parse(window?.global?.localStorage.getItem("authUser") || "{}" );
     if(!user) return {}
     if(key)return user[key]

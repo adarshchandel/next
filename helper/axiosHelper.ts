@@ -4,6 +4,7 @@ import { getCurrentUser } from "./common"
 const instance = axios.create({
     baseURL: server_url,
     timeout: 30000,
+    // withCredentials : true,
     headers: {
         token: getCurrentUser("token")
     }
